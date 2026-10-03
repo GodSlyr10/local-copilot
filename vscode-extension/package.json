@@ -1,0 +1,89 @@
+{
+  "name": "local-copilot",
+  "displayName": "Local Copilot (Ollama + LangGraph)",
+  "description": "A Copilot-style chat and agent for VS Code powered by a local Ollama model and a LangGraph backend.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["AI", "Chat"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "localCopilot", "title": "Local Copilot", "icon": "media/icon.svg" }
+      ]
+    },
+    "views": {
+      "localCopilot": [
+        { "type": "webview", "id": "localCopilot.chat", "name": "Chat" }
+      ]
+    },
+    "commands": [
+      { "command": "localCopilot.newChat", "title": "Local Copilot: New Chat", "icon": "$(add)" },
+      { "command": "localCopilot.explain", "title": "Local Copilot: Explain This" },
+      { "command": "localCopilot.fix", "title": "Local Copilot: Fix This" },
+      { "command": "localCopilot.tests", "title": "Local Copilot: Generate Tests" },
+      { "command": "localCopilot.doc", "title": "Local Copilot: Add Documentation" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "localCopilot.newChat", "when": "view == localCopilot.chat", "group": "navigation" }
+      ],
+      "editor/context": [
+        { "command": "localCopilot.explain", "when": "editorHasSelection", "group": "9_localcopilot@1" },
+        { "command": "localCopilot.fix", "when": "editorHasSelection", "group": "9_localcopilot@2" },
+        { "command": "localCopilot.tests", "when": "editorHasSelection", "group": "9_localcopilot@3" },
+        { "command": "localCopilot.doc", "when": "editorHasSelection", "group": "9_localcopilot@4" }
+      ]
+    },
+    "configuration": {
+      "title": "Local Copilot",
+      "properties": {
+        "localCopilot.serverUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8765",
+          "description": "URL of the Local Copilot backend (python server.py)."
+        },
+        "localCopilot.safeCommands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["ls", "dir", "pwd", "git status", "git diff", "git log", "git branch"],
+          "description": "Commands that run without asking. Only simple commands match: anything containing ; & | < > ` $ ( ) or a newline always asks."
+        },
+        "localCopilot.commandTimeoutSeconds": {
+          "type": "number",
+          "default": 60,
+          "description": "Kill commands that run longer than this."
+        },
+        "localCopilot.autoSaveAfterApply": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save the file right after you approve a change."
+        },
+        "localCopilot.inlineCompletions.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ghost-text completions while typing. Needs a code model that supports fill-in-the-middle, e.g. `ollama pull qwen2.5-coder:1.5b`."
+        },
+        "localCopilot.inlineCompletions.debounceMs": {
+          "type": "number",
+          "default": 350,
+          "description": "Wait this long after you stop typing before asking for a completion."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.4.0"
+  }
+}
